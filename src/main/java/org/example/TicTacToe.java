@@ -1,5 +1,8 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class TicTacToe {
@@ -7,8 +10,9 @@ public class TicTacToe {
     private boolean currentPlayerIsX;
     private boolean gameIsOngoing;
     private final Scanner scanner;
+    private boolean computerOponent;
 
-    public TicTacToe(Scanner scanner, int size) {
+    public TicTacToe(Scanner scanner, int size, boolean computerOponent) {
         this.matrix = new String[size][size];
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
@@ -18,6 +22,7 @@ public class TicTacToe {
         this.currentPlayerIsX = true;
         this.gameIsOngoing = true;
         this.scanner = scanner;
+        this.computerOponent = computerOponent;
     }
 
     public void initialize(){
@@ -40,6 +45,21 @@ public class TicTacToe {
                 System.out.println("Nobody has won!");
                 break;
             }
+            if (computerOponent){
+                currentPlayerIsX = !currentPlayerIsX;
+                System.out.println("hello from computer");
+                computerMakeMove();
+                drawMatrix();
+                if (checkIfPlayerWon()){
+                    gameIsOngoing = false;
+                    System.out.println("Player " + (currentPlayerIsX ? "X" : "O") + " has won!" );
+                    break;
+                }
+                if(checkIfTied()){
+                    System.out.println("Nobody has won!");
+                    break;
+                }
+            }
             currentPlayerIsX = !currentPlayerIsX;
             System.out.println("It's " + (currentPlayerIsX ? "X" : "O") + " player's turn!");
         }
@@ -61,29 +81,44 @@ public class TicTacToe {
                 || checkIfPlayerWonDiagonal();
     }
 
-
     private boolean checkIfPlayerWonRow(){
-        boolean outcome = true;
+        boolean outcome = false;
+        int winRows = 0;
+        int sameElementsInRow = 0;
         String symbol = currentPlayerIsX ? "X" : "O";
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
-                if (!matrix[i][0].equals(matrix[i][j])){
-                    outcome = false;
+                if (symbol.equals(matrix[i][j])){
+                    sameElementsInRow++;
                 }
             }
+            if (sameElementsInRow == matrix.length){
+                winRows++;
+            } else {
+                sameElementsInRow = 0;
+            }
         }
+        if (winRows > 0) outcome = true;
         return outcome;
     }
     private boolean checkIfPlayerWonColumn(){
-        boolean outcome = true;
+        boolean outcome = false;
+        int winColumns = 0;
+        int sameElementsInColumn = 0;
         String symbol = currentPlayerIsX ? "X" : "O";
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
-                if (!matrix[0][i].equals(matrix[j][i])){
-                    outcome = false;
+                if (symbol.equals(matrix[j][i])){
+                    sameElementsInColumn++;
                 }
             }
+            if (sameElementsInColumn == matrix.length){
+                winColumns++;
+            } else {
+                sameElementsInColumn = 0;
+            }
         }
+        if (winColumns > 0) outcome = true;
         return outcome;
     }
     private boolean checkIfPlayerWonDiagonal(){
@@ -116,5 +151,59 @@ public class TicTacToe {
         String symbol = currentPlayerIsX ? "X" : "O";
         matrix[row][column] = symbol;
         return true;
+    }
+
+    private void remove(int row, int column){
+        matrix[row][column] = " ";
+    }
+
+    private void computerMakeRandomMove(){
+        List<int[]> freeSpaces = new ArrayList<>();
+        for (int i = 0; i < matrix.length; i++){
+            for (int j = 0; j < matrix.length; j++){
+                if (matrix[i][j].equals(" ")){
+                    int[] freeSpace = {i,j};
+                    freeSpaces.add(freeSpace);
+                }
+            }
+        }
+        int[] selectedMove = freeSpaces.get((int) Math.floor(Math.random() * freeSpaces.size()));
+        place(selectedMove[0], selectedMove[1]);
+    }
+
+    private void computerMakeMove(){
+        List<int[]> freeSpaces = new ArrayList<>();
+        List<int[]> winningMoves = new ArrayList<>();
+        // find free spaces
+        for (int i = 0; i < matrix.length; i++){
+            for (int j = 0; j < matrix.length; j++){
+                if (matrix[i][j].equals(" ")){
+                    int[] freeSpace = {i,j};
+                    freeSpaces.add(freeSpace);
+                }
+            }
+        }
+        // find winning spaces
+        System.out.println("free spaces: " + freeSpaces.size());
+        currentPlayerIsX = !currentPlayerIsX;
+        for (int[] space : freeSpaces){
+            place(space[0], space[1]);
+            if (checkIfPlayerWon()){
+                winningMoves.add(space);
+            }
+            remove(space[0], space[1]);
+    }
+        System.out.println("winning spaces: " + winningMoves.size());
+        for (int[] move : winningMoves){
+            System.out.println(Arrays.toString(move));
+        }
+        currentPlayerIsX = !currentPlayerIsX;
+        // make a move
+        if (winningMoves.size() > 0){
+            int[] selectedMove = winningMoves.get((int) Math.floor(Math.random() * winningMoves.size()));
+            place(selectedMove[0], selectedMove[1]);
+        } else {
+            computerMakeRandomMove();
+        }
     }
 }
