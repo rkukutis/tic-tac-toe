@@ -11,6 +11,7 @@ public class TicTacToe {
     private boolean gameIsOngoing;
     private final Scanner scanner;
     private boolean computerOponent;
+    private int moveNumber;
 
     public TicTacToe(Scanner scanner, int size, boolean computerOponent) {
         this.matrix = new String[size][size];
@@ -23,6 +24,7 @@ public class TicTacToe {
         this.gameIsOngoing = true;
         this.scanner = scanner;
         this.computerOponent = computerOponent;
+        this.moveNumber = 0;
     }
 
     public void initialize(){
@@ -47,7 +49,7 @@ public class TicTacToe {
             }
             if (computerOponent){
                 currentPlayerIsX = !currentPlayerIsX;
-                System.out.println("hello from computer");
+                System.out.println("Computer makes a move");
                 computerMakeMove();
                 drawMatrix();
                 if (checkIfPlayerWon()){
@@ -62,6 +64,7 @@ public class TicTacToe {
             }
             currentPlayerIsX = !currentPlayerIsX;
             System.out.println("It's " + (currentPlayerIsX ? "X" : "O") + " player's turn!");
+            moveNumber++;
         }
         System.out.println("Game ended");
     }
@@ -172,8 +175,19 @@ public class TicTacToe {
     }
 
     private void computerMakeMove(){
+        if (moveNumber == 0){
+            if (matrix[matrix.length/2][matrix.length/2].equals(" ")){
+                place(matrix.length/2, matrix.length/2);
+            } else {
+                computerMakeRandomMove();
+            }
+            return;
+        }
+
         List<int[]> freeSpaces = new ArrayList<>();
-        List<int[]> winningMoves = new ArrayList<>();
+        List<int[]> playerWinMoves = new ArrayList<>();
+        List<int[]> computerWinMoves = new ArrayList<>();
+
         // find free spaces
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
@@ -183,27 +197,41 @@ public class TicTacToe {
                 }
             }
         }
-        // find winning spaces
+        // find player winning spaces
         System.out.println("free spaces: " + freeSpaces.size());
         currentPlayerIsX = !currentPlayerIsX;
         for (int[] space : freeSpaces){
             place(space[0], space[1]);
             if (checkIfPlayerWon()){
-                winningMoves.add(space);
+                playerWinMoves.add(space);
             }
             remove(space[0], space[1]);
     }
-        System.out.println("winning spaces: " + winningMoves.size());
-        for (int[] move : winningMoves){
+
+        System.out.println("winning spaces: " + playerWinMoves.size());
+        for (int[] move : playerWinMoves){
             System.out.println(Arrays.toString(move));
         }
         currentPlayerIsX = !currentPlayerIsX;
+
+        // find computer winning spaces
+        for (int[] space : freeSpaces){
+            place(space[0], space[1]);
+            if (checkIfPlayerWon()){
+                computerWinMoves.add(space);
+            }
+            remove(space[0], space[1]);
+        }
+
         // make a move
-        if (winningMoves.size() > 0){
-            int[] selectedMove = winningMoves.get((int) Math.floor(Math.random() * winningMoves.size()));
+        if (playerWinMoves.size() > 0){
+            int[] selectedMove = playerWinMoves.get((int) Math.floor(Math.random() * playerWinMoves.size()));
+            if (computerWinMoves.size() > 0) selectedMove = computerWinMoves.get(0);
             place(selectedMove[0], selectedMove[1]);
         } else {
             computerMakeRandomMove();
         }
     }
+
+    // TODO: minimax algorithm
 }

@@ -9,7 +9,8 @@ public class Main {
 //        Hangman hangman = new Hangman(3, scanner, "pasta", "hello", "world");
 //        hangman.initialize();
 
-        var ticTacToe = new TicTacToe(scanner, 4, true);
+        var ticTacToe = new TicTacToeMinimax(scanner, 3, true);
         ticTacToe.initialize();
+//        TestGame.test();
     }
 }
