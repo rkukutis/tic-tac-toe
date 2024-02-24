@@ -1,3 +1,1 @@
-# java-games
-
-Simple games coded in java...
+# Tic-Tac-Toe with Computer opponent
