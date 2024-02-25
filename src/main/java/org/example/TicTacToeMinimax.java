@@ -1,8 +1,6 @@
 package org.example;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class TicTacToeMinimax {
@@ -10,10 +8,9 @@ public class TicTacToeMinimax {
 
     private boolean gameIsOngoing;
     private final Scanner scanner;
-    private boolean computerOpponent;
 
-    public TicTacToeMinimax(Scanner scanner, int size, boolean computerOpponent) {
-        this.matrix = new String[size][size];
+    public TicTacToeMinimax(Scanner scanner) {
+        this.matrix = new String[3][3];
         for (int i = 0; i < matrix.length; i++){
             for (int j = 0; j < matrix.length; j++){
                 matrix[i][j] = " ";
@@ -21,7 +18,6 @@ public class TicTacToeMinimax {
         }
         this.gameIsOngoing = true;
         this.scanner = scanner;
-        this.computerOpponent = computerOpponent;
     }
 
     public void initialize(){
@@ -30,6 +26,11 @@ public class TicTacToeMinimax {
             int row = Integer.parseInt(scanner.nextLine());
             System.out.println("Enter column to place X");
             int col = Integer.parseInt(scanner.nextLine());
+            if (row < 0 || col < 0 || row >= matrix.length || col >= matrix.length ||
+                    !matrix[row][col].equals(" ")) {
+                System.out.println("Invalid square!");
+                continue;
+            }
             matrix[row][col] = "X";
             drawBoard(matrix);
             if (checkIfPlayerWon(matrix) == 10){
@@ -41,20 +42,18 @@ public class TicTacToeMinimax {
                 System.out.println("Nobody has won!");
                 break;
             }
-            if (computerOpponent){
-                System.out.println("Computer makes a move");
-                int[] bestMove = findBestMove(matrix);
-                matrix[bestMove[0]][bestMove[1]] = "O";
-                drawBoard(matrix);
-                if (checkIfPlayerWon(matrix) == -10){
-                    gameIsOngoing = false;
-                    System.out.println("Player O has won!" );
-                    break;
-                }
-                if(checkIfTied(matrix)){
-                    System.out.println("Nobody has won!");
-                    break;
-                }
+            System.out.println("Computer makes a move");
+            int[] bestMove = findBestMove(matrix);
+            matrix[bestMove[0]][bestMove[1]] = "O";
+            drawBoard(matrix);
+            if (checkIfPlayerWon(matrix) == -10){
+                gameIsOngoing = false;
+                System.out.println("Player O has won!" );
+                break;
+            }
+            if(checkIfTied(matrix)){
+                System.out.println("Nobody has won!");
+                break;
             }
             System.out.println("It's X player's turn!");
         }

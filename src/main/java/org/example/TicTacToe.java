@@ -150,7 +150,8 @@ public class TicTacToe {
     }
 
     private boolean place(int row, int column){
-        if (matrix[row][column] != " " || matrix[row][column].equals(currentPlayerIsX ? "X" : "O")) return false;
+        if (row < 0 || column < 0 || row >= matrix.length || column >= matrix.length ||
+                !matrix[row][column].equals(" ")) return false;
         String symbol = currentPlayerIsX ? "X" : "O";
         matrix[row][column] = symbol;
         return true;
