@@ -171,17 +171,17 @@ public class TicTacToeMinimax {
     }
 
     private int[] findBestMove(String[][] board){
-            int bestScore = -1000;
+            int bestScore = Integer.MAX_VALUE;
             int[] bestMove = {-1, -1};
 
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board.length; j++) {
                     if (board[i][j].equals(" ")) {
-                        board[i][j] = "X";
-                        int score = minimax(board, 0, false);
+                        board[i][j] = "O";
+                        int score = minimax(board, 0, true);
                         System.out.println("Move" + "(" + i + ", " + j + ") score: " + score);
                         board[i][j] = " ";
-                        if (score > bestScore) {
+                        if (score < bestScore) {
                             bestScore = score;
                             bestMove[0] = i;
                             bestMove[1] = j;
@@ -196,34 +196,34 @@ public class TicTacToeMinimax {
 
     private int minimax(String[][] board, int depth, boolean isMaximizer) {
         int score = checkIfPlayerWon(board);
+        if (checkIfTied(board) && score == 0) return 0;
         if (score == 10) return score - depth;
         if (score == -10) return score + depth;
-        if (checkIfTied(board)) return 0;
 
-        int best;
         if (isMaximizer) {
-            best = -1000;
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
+            int best = Integer.MIN_VALUE;
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board.length; j++) {
                     if (board[i][j].equals(" ")) {
-                        board[i][j] = "O";
+                        board[i][j] = "X";
                         best = Math.max(best, minimax(board, depth + 1, false));
                         board[i][j] = " ";
                     }
                 }
             }
+            return best;
         } else {
-            best = 1000;
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
+            int best = Integer.MAX_VALUE;
+            for (int i = 0; i < board.length; i++) {
+                for (int j = 0; j < board.length; j++) {
                     if (board[i][j].equals(" ")) {
-                        board[i][j] = "X";
+                        board[i][j] = "O";
                         best = Math.min(best, minimax(board, depth + 1, true));
                         board[i][j] = " ";
                     }
                 }
             }
+            return best;
         }
-        return best;
     }
 }
